@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>匀速轮播</title>
+	<style>
+		*{margin:0;padding: 0;}
+		.box{
+			position: relative;
+			width: 1000px;
+			height: 500px;
+			margin: 50px auto;
+			overflow: hidden;
+		}
+		#all{
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 500px;
+		}
+		a{
+			float: left;
+			display: block;
+		}
+		img{
+			display: block;
+			width: 1000px;
+			height: 500px;
+		}
+		#arrowsLeft,#arrowsRight{
+			position: absolute;
+			top: 227px;
+			width: 46px;
+			height: 46px;
+			opacity: .7;
+			transition: all .3s;
+		}
+		#arrowsLeft:hover,#arrowsRight:hover{
+			opacity: 1;
+			transform:scale(1.07);
+		}
+		#arrowsLeft{
+			left: 20px;
+			background: url(images/left.png) no-repeat;
+		}
+		#arrowsRight{
+			right: 20px;
+			background: url(images/right.png) no-repeat;
+		}
+		#dot{
+			position: absolute;
+			bottom: 15px;
+			left: 50%;
+			margin-left: -75px;
+			width: 150px;
+			height: 20px;
+			display: flex;
+			justify-content:space-between;
+		}
+		span{
+			display: block;
+			width: 20px;
+			height: 20px;
+			border-radius: 50%;
+			background-color: rgba(255,255,255,.701);
+		}
+		.yellow{
+			background-color: yellow;
+		}
+	</style>
+</head>
+<body>
+	<div class="box">
+		<div id="all" style="left:0;">
+			<a><img src="images/1.jpg"></a>
+			<a><img src="images/2.jpg"></a>
+			<a><img src="images/3.jpg"></a>
+			<a><img src="images/4.jpg"></a>
+			<a><img src="images/5.jpg"></a>images/
+
+		</div>
+		<div id="arrowsLeft"></div>
+		<div id="arrowsRight"></div>
+		<div id="dot"></div>
+	</div>
+	<script>
+		var box = document.getElementsByClassName('box')[0]
+		var all = document.getElementById('all')  
+		var alist = all.getElementsByTagName('a')  //图片
+		var arrowsLeft = document.getElementById('arrowsLeft')  //左箭头
+		var arrowsRight = document.getElementById('arrowsRight')  //右箭头
+		var dots = document.getElementById('dot')
+		var n=0;//记录图片在第几张
+		var z=0 //记住真正的图片位置
+		var count = alist.length //记录长度
+		var zhenN = false  //判断n 的位置是否为真
+		var dianJi = false //判断点击是否执行完毕
+
+		var MS = 30  //代表毫秒
+
+		arrowsRight.onclick = function(){
+			if(!dianJi){
+				n++;
+				z++
+				if(n == count){
+					z=0
+					all.appendChild(alist[0].cloneNode(true))
+				}
+				rightMove()
+			}
+		}
+		function rightMove(){
+			yuanDianYanSe()  //更新小圆点颜色
+			stopRightTime = setInterval(function(){
+				dianJi = true
+				all.style.width = alist.length*1000 + "px" //动态获取all的宽度
+				movePx = parseInt(all.style.left) //不断更新移动过的距离
+				// 不断地 赋值
+				all.style.left = movePx + Math.floor((n*(-1000)-movePx)/10) + "px"
+				if(n*(-1000) == movePx){  
+					clearInterval(stopRightTime)
+					dianJi = false
+					if(n ==count){
+						all.style.left = 0 + "px"
+						all.removeChild(alist[alist.length-1])
+						n=0;
+					}
+				}
+			},MS)
+		}
+
+		arrowsLeft.onclick = function(){
+			if(!dianJi){
+				n--;
+				z--;
+				if(n == -1){
+					n=0
+					z=count-1
+					all.insertBefore(alist[alist.length-1].cloneNode(true),alist[0])
+					all.style.left = "-1000px"; 
+					zhanN = true
+				}
+			leftMove()
+			}
+		}
+		function leftMove(){
+			yuanDianYanSe()  //更新小圆点颜色
+			stopLeftTime = setInterval(function(){
+				dianJi = true
+				all.style.width = alist.length*1000 + "px" //动态获取all的宽度
+				movePx = parseInt(all.style.left) //不断更新移动过的距离
+				// 不断地 赋值
+				all.style.left = movePx + Math.ceil((n*(-1000)-movePx)/10) + "px"
+				if(n*(-1000) == movePx){
+					clearInterval(stopLeftTime)
+					dianJi = false
+					if(zhanN == true){
+						all.style.left = (count-1)*(-1000) + "px"
+						all.removeChild(alist[0])
+						n = count-1;
+						zhanN = false
+						all.style.width = alist.length*1000 + "px" //动态获取all的宽度
+					}
+				}
+			},MS)
+		}
+
+
+		//自动播放
+		autoPlay = setInterval(function(){
+			arrowsRight.onclick()
+		},3000)
+
+		box.onmouseenter = function(){
+			clearInterval(autoPlay)
+		}
+		box.onmouseleave = function(){
+			autoPlay = setInterval(function(){
+				arrowsRight.onclick()
+			},3000)
+		}
+
+		//循环创建dot圆点
+		for(var i=0;i<count;i++){
+			var span =  document.createElement('span')
+			span.innerHTML = i
+			dots.appendChild(span)
+		}
+
+		//更新小圆点的颜色
+		function yuanDianYanSe(){
+			dotList = dots.getElementsByTagName('span')
+			for(var c=0;c<dotList.length;c++){
+				dotList[c].className = ""
+			}
+			dotList[z].className = "yellow"
+		}
+		yuanDianYanSe()
+
+		// 大问题  
+		for(var d=0;d<dotList.length;d++){
+			dotList[d].onclick = function(){
+				yuanDianYanSe() //更新小圆点颜色
+					console.log(n)
+					console.log(this.innerHTML)
+
+					if(n > Number(this.innerHTML)){
+						n = Number(this.innerHTML)
+						m = n
+						yuanDianJiShi = setInterval(function(){
+							gengXin = parseInt(all.style.left)
+							all.style.left = gengXin + Math.ceil((n*(-1000)-gengXin)/10) + "px"
+							// if()
+						},MS)
+					}
+
+					if(n < Number(this.innerHTML)){
+						n = Number(this.innerHTML)
+						m = n
+						yuanDianJiShi = setInterval(function(){
+							gengXin = parseInt(all.style.left)
+							all.style.left = gengXin + Math.floor((n*(-1000)-gengXin)/10) + "px"
+						},MS)
+					}
+
+					
+			}
+		}
+
+
+				// if(n > Number(this.innerHTML)){
+				// 	n = Number(this.innerHTML)
+				// 	m = n
+				// 	leftMove()
+				// }
+				// if(n < Number(this.innerHTML)){
+				// 	n = Number(this.innerHTML)
+				// 	m = n
+				// 	rightMove()
+				// }
+
+
+	</script>
+</body>
+</html>
