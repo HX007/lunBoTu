@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>渐隐渐现</title>
+	<script src="../jquery-3.3.1.min.js"></script>
+	<style>
+	.box{
+		position: relative;
+		width: 1000px;
+		height: 409px;
+		margin:30px auto; 
+	}
+	
+	.img img{
+		width: 1000px;
+		animation:img 1s linear;
+	}
+	#up,#down{
+		position: absolute;
+		top:180px;
+		opacity: .7;
+		transition:all .2s;
+	}
+	#up:hover,#down:hover{
+		opacity: 1;
+		transform:scale(1.07);
+	}
+	#up{
+		left: 15px;
+	}
+	#down{
+		right: 15px;
+	}
+	#dot{
+		position: absolute;
+		left: 42%;
+		bottom: 20px;
+	}
+	span{
+		display: block;
+		float: left;
+		width: 18px;
+		height: 18px;
+		margin: 0 5px;
+		border-radius: 50%;
+		background-color: #fff;
+	}
+	.color{
+		background-color: yellow;
+	}
+	</style>
+</head>
+<body>
+	<div class="box">
+		<div class="img" id="img">
+			<img src="images/timg1.jpg" class="imgs">
+			<img src="images/timg2.jpg" class="imgs">
+			<img src="images/timg3.jpg" class="imgs">
+			<img src="images/timg4.jpg" class="imgs">
+			<img src="images/timg5.jpg" class="imgs">
+			<img src="images/timg6.jpg" class="imgs">
+		</div>
+		<img src="images/l.png" id="up">
+		<img src="images/r.png" id="down">
+		<div id="dot"></div>
+	</div>
+	<script>
+		$imgList = $("#img").find(".imgs")
+		var n=0//记录图片在第几张
+		for(var a=0;a<$imgList.length;a++){
+			//创建dot圆点(自适应)
+			var dot = document.createElement("span")
+			dot.setAttribute("set",a)
+			$("#dot")[0].appendChild(dot)
+			//默认隐藏所有图片
+			$imgList.eq(a).hide()
+		}
+		//默认打开第一张图片，添加第一个圆点样式
+		$imgList.eq(0).show()
+		$("#dot span").eq(0).addClass("color")
+
+		function none(){
+			for(var b=0;b<$imgList.length;b++){
+				$imgList.eq(b).hide()//隐藏图片
+				$("#dot span").eq(b).removeClass("color")//去掉圆点的样式
+			}
+		}
+		function block(){
+			$imgList.eq(n).fadeIn(600)//显示图片
+			$("#dot span").eq(n).addClass("color")//加上圆点样式
+		}
+		function right(){
+			none()//隐藏
+			if(n < $imgList.length-1){
+				n++
+			}else{
+				n=0
+			}
+			block()//显示
+		}
+		// 右边
+		$("#down").click(function(){
+			right()
+		})
+		//左边
+		$("#up").click(function(){
+			none()//隐藏
+			if(n != 0){
+				n--
+			}else{
+				n=$imgList.length-1
+			}
+			block()//显示
+		})
+		// 圆点样式
+		$("#dot span").click(function(){
+			n = this.getAttribute("set")
+			none()
+			block()
+		})
+		// 自动播放
+		function play(){
+			var autoPlay = setInterval(function(){
+				right()
+				$("#img")[0].onmouseenter = function(){
+					clearInterval(autoPlay)
+				}
+				$("#img")[0].onmouseleave = function(){
+					play()
+				}
+			},3000)
+		}
+		play()
+
+	</script>
+</body>
+</html>
