@@ -90,7 +90,9 @@
 			$imgList.eq(n).fadeIn(600)//显示图片
 			$("#dot span").eq(n).addClass("color")//加上圆点样式
 		}
-		function right(){
+
+		// 右边
+		$("#down").click(function(){
 			none()//隐藏
 			if(n < $imgList.length-1){
 				n++
@@ -98,10 +100,6 @@
 				n=0
 			}
 			block()//显示
-		}
-		// 右边
-		$("#down").click(function(){
-			right()
 		})
 		//左边
 		$("#up").click(function(){
@@ -122,11 +120,11 @@
 		// 自动播放
 		function play(){
 			var autoPlay = setInterval(function(){
-				right()
-				$("#img")[0].onmouseenter = function(){
+				$("#down").click()
+				$(".box")[0].onmouseenter = function(){
 					clearInterval(autoPlay)
 				}
-				$("#img")[0].onmouseleave = function(){
+				$(".box")[0].onmouseleave = function(){
 					play()
 				}
 			},3000)

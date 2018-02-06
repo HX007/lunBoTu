@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>滑动</title>
+	<script src="../jquery-3.3.1.min.js"></script>
+	<style>
+	.box{
+		position: relative;
+		width: 1000px;
+		height: 409px;
+		margin:30px auto; 
+		overflow: hidden;
+	}
+
+	.img img{
+		float: left;
+		width: 1000px;
+		animation:img 1s linear;
+	}
+	#up,#down{
+		position: absolute;
+		top:180px;
+		opacity: .7;
+		transition:all .2s;
+	}
+	#up:hover,#down:hover{
+		opacity: 1;
+		transform:scale(1.07);
+	}
+	#up{
+		left: 15px;
+	}
+	#down{
+		right: 15px;
+	}
+	#dot{
+		position: absolute;
+		left: 42%;
+		bottom: 20px;
+	}
+	span{
+		display: block;
+		float: left;
+		width: 18px;
+		height: 18px;
+		margin: 0 5px;
+		border-radius: 50%;
+		background-color: #fff;
+	}
+	.color{
+		background-color: yellow;
+	}
+	</style>
+</head>
+<body>
+	<div class="box">
+		<div class="img" id="img">
+			<img src="images/timg1.jpg" class="imgs">
+			<img src="images/timg2.jpg" class="imgs">
+			<img src="images/timg3.jpg" class="imgs">
+			<img src="images/timg4.jpg" class="imgs">
+			<img src="images/timg5.jpg" class="imgs">
+			<img src="images/timg6.jpg" class="imgs">
+		</div>
+		<img src="images/l.png" id="up">
+		<img src="images/r.png" id="down">
+		<div id="dot"></div>
+	</div>
+	<script>
+		var $imgList = $("#img").find(".imgs")
+		var contar = $imgList.length
+		var n=0//记录图片在第几张
+		var lock = false
+		//图片自适应
+		$("#img")[0].style.width = contar*1000 + "px"
+		//初始化圆点(自适应)
+		for(var a=0;a<contar;a++){
+			//创建dot圆点
+			var $dot = $("<span></span>")
+			$dot.attr("index",a)
+			$dot.appendTo($("#dot"))//插入JQ对象
+		}
+		$dotList = $("#dot").find("span")//找到圆点集合(jQuery对象)
+		//添加默认的样式
+		$dotList.eq(0).addClass("color")
+		// 向下
+		$("#down").click(function(){
+			if(lock == false){
+				lock = true
+				if(n<contar){
+					n++
+				}
+				if(n==contar){
+					n=0
+				}
+				$("#img").animate({
+					marginLeft:-(n*1000),
+				},600,function(){
+					lock = false
+				})
+				yuandian()
+			}
+		})
+		// 向上
+		$("#up").click(function(){
+			if(lock == false){
+				lock = true
+				if(n>=0){
+					n--
+				}
+				if(n==-1){
+					n=contar-1
+				}
+				$("#img").animate({
+					marginLeft:-(n*1000)
+				},600,function(){
+					lock = false
+				})
+				yuandian()
+			}
+		})
+		//重置圆点样式
+		function yuandian(){
+			for(var a=0;a<contar;a++){
+				$dotList.eq(a).removeClass("color")
+			}
+			$dotList.eq(n).addClass("color")
+		}
+		//点击圆点
+		$dotList.click(function(){
+			var m = $(this).attr("index")
+				n = m
+				$("#img").animate({
+					marginLeft:-(n*1000)
+				},600)
+				yuandian()
+		})
+		//自动播放
+		autoPlay = setInterval(function(){
+			$("#down").click()
+		},3000)
+
+		//暂停自动播放判断
+		$(".box").eq(0).mouseenter(function(){
+			clearInterval(autoPlay)
+		})
+		$(".box").eq(0).mouseleave(function(){
+			autoPlay = setInterval(function(){
+				$("#down").click()
+			},3000)
+		})
+	</script>
+</body>
+</html>
